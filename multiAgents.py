@@ -10,6 +10,7 @@
 # (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
 # Student side autograding was added by Brad Miller, Nick Hay, and
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
+# completed by : Seyed Nami Modarressi (@SNamiMod)
 
 
 from util import manhattanDistance
@@ -17,7 +18,6 @@ from game import Directions
 import random, util
 
 from game import Agent
-
 
 class ReflexAgent(Agent):
     """
@@ -72,9 +72,24 @@ class ReflexAgent(Agent):
         newFood = successorGameState.getFood()
         newGhostStates = successorGameState.getGhostStates()
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
+        minValue = 99999999 # this is value is needed in comparing values
 
         "*** YOUR CODE HERE ***"
-        return successorGameState.getScore()
+        minDistanceToFood = minValue
+        
+        for ghost in newGhostStates:
+            if ghost.scaredTimer >= 1 :
+                continue
+            if manhattanDistance(newPos,ghost.getPosition()) <= 1:
+                return -minValue
+        
+        for food in newFood.asList():
+            temp = manhattanDistance(newPos, food)
+            if temp < minDistanceToFood:
+                minDistanceToFood = temp
+        
+        value = 1/minDistanceToFood
+        return successorGameState.getScore() + value
 
 
 def scoreEvaluationFunction(currentGameState):
