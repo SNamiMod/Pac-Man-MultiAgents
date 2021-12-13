@@ -262,7 +262,50 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         legal moves.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return self.expectimax(0, 0, gameState)[0]
+    
+    def expectimax(self, depth, agent, gameState):
+        
+        change = 0 # for the first time we should update action and score
+        expectimax_action = 0
+        expectimax_score = 0
+
+        if agent == gameState.getNumAgents():
+            depth = depth + 1
+            agent = 0 # PacMan number is 0
+            
+        if depth == self.depth:
+            return [None, self.evaluationFunction(gameState)]
+            
+        if agent == 0: # Find Max
+            for action in gameState.getLegalActions(agent):  # compare score to all other scores (scores of legal actions)
+                next_state = gameState.generateSuccessor(agent, action)
+                score = self.expectimax(depth, agent + 1, next_state)[1]
+                if score > expectimax_score or change == 0:
+                    expectimax_action = action
+                    expectimax_score = score
+                    change = 1
+
+        else: # Find Min - in this case we should add probability (for ghosts)
+            len_action = len(gameState.getLegalActions(agent))
+            if len_action == 0:
+                p = 1
+            else:
+                p = 1 / len_action
+            for action in gameState.getLegalActions(agent):  # compare score to all other scores (scores of legal actions)
+                next_state = gameState.generateSuccessor(agent, action)
+                score = self.expectimax(depth, agent + 1, next_state)[1]
+
+                if change == 0:
+                    change = 1
+                    
+                expectimax_action = action
+                expectimax_score = expectimax_score + p * score
+                        
+        if change == 1:
+            return [expectimax_action, expectimax_score]
+        else:
+            return [None, self.evaluationFunction(gameState)]
 
 
 def betterEvaluationFunction(currentGameState):
