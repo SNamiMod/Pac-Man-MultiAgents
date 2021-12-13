@@ -13,6 +13,7 @@
 # completed by : Seyed Nami Modarressi (@SNamiMod)
 
 
+from typing import final
 from util import manhattanDistance
 from game import Directions
 import random, util
@@ -314,10 +315,48 @@ def betterEvaluationFunction(currentGameState):
     evaluation function (question 5).
 
     DESCRIPTION: <write something here so we know what you did>
+    we should evaluate states instead of actions and for this we use this parameters :
+        1 - number of food
+        2 - distances(for food)
+        3 - distances(for ghosts)
+        4 - distances(for scared ghosts)
+        5 - number of capsules
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
 
+    Position = currentGameState.getPacmanPosition() # PacMan
+    food = currentGameState.getFood().asList()
+    ghosts = currentGameState.getGhostStates()
+    final_value = currentGameState.getScore() # Evaluation value with start value
+
+    final_value = final_value + -5 * len(food) # number of food
+    final_value = final_value + -10 * len(currentGameState.getCapsules()) # number of capsules
+
+    for f in food:
+        d = manhattanDistance(Position,f)
+        if d < 2:
+            final_value = final_value + -1 * d
+        if d > 5:
+            final_value = final_value + -0.1 * d
+        else:
+            final_value = final_value + -0.5 * d
+
+    for g in ghosts:
+        d = manhattanDistance(Position,g.getPosition())
+        if g.scaredTimer == 0:
+            if d < 2:
+                final_value = final_value + -15 * d
+            else:
+                final_value = final_value + -5 * d
+        else:
+            if d < 2:
+                final_value = final_value + 3 * d
+            elif d < 5:
+                final_value = final_value + 2 * d
+            else:
+                final_value = final_value + 0.5 * d
+
+    return final_value
 
 # Abbreviation
 better = betterEvaluationFunction
