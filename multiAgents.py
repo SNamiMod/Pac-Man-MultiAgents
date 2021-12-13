@@ -72,7 +72,7 @@ class ReflexAgent(Agent):
         newFood = successorGameState.getFood()
         newGhostStates = successorGameState.getGhostStates()
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
-        minValue = 99999999 # this is value is needed in comparing values
+        minValue = 999999 # this is value is needed in comparing values
 
         "*** YOUR CODE HERE ***"
         minDistanceToFood = minValue
@@ -153,9 +153,44 @@ class MinimaxAgent(MultiAgentSearchAgent):
         Returns whether or not the game state is a losing state
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return self.minimax(0, 0, gameState)[0]
 
+    def minimax(self, depth, agent, gameState):
+        
+        change = 0 # for the first time we should update action and score
+        minORmax_action = 0
+        minORmax_score = 0
 
+        if agent == gameState.getNumAgents():
+            depth = depth + 1
+            agent = 0 # PacMan number is 0
+            
+        if depth == self.depth:
+            return [None, self.evaluationFunction(gameState)]
+            
+        if agent == 0: # Find Max
+            for action in gameState.getLegalActions(agent):  # compare score to all other scores (scores of legal actions)
+                next_state = gameState.generateSuccessor(agent, action)
+                score = self.minimax(depth, agent + 1, next_state)[1]
+                if score > minORmax_score or change == 0:
+                    minORmax_action = action
+                    minORmax_score = score
+                    change = 1
+
+        else: # Find Min
+            for action in gameState.getLegalActions(agent):  # compare score to all other scores (scores of legal actions)
+                next_state = gameState.generateSuccessor(agent, action)
+                score = self.minimax(depth, agent + 1, next_state)[1]
+                if score < minORmax_score or change == 0:
+                    minORmax_action = action
+                    minORmax_score = score
+                    change = 1
+                        
+        if change == 1:
+            return [minORmax_action, minORmax_score]
+        else:
+            return [None, self.evaluationFunction(gameState)]
+            
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
     Your minimax agent with alpha-beta pruning (question 3)
