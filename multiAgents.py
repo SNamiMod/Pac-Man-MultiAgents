@@ -201,8 +201,53 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         Returns the minimax action using self.depth and self.evaluationFunction
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        minValue = 999999 # this is value is needed in comparing values
+        return self.AlphaBeta(0, 0, gameState, -minValue, minValue)[0] #-> alpha = -999999 and beta = 999999
 
+    def AlphaBeta(self, depth, agent, gameState , alpha , beta):
+        
+        change = 0 # for the first time we should update action and score
+        AlphaBeta_action = 0
+        AlphaBeta_score = 0
+
+        if agent == gameState.getNumAgents():
+            depth = depth + 1
+            agent = 0 # PacMan number is 0
+            
+        if depth == self.depth:
+            return [None, self.evaluationFunction(gameState)]
+            
+        if agent == 0: # Find Max
+            for action in gameState.getLegalActions(agent):  # compare score to all other scores (scores of legal actions)
+                next_state = gameState.generateSuccessor(agent, action)
+                score = self.AlphaBeta(depth, agent + 1, next_state , alpha , beta)[1]
+                if score > AlphaBeta_score or change == 0:
+                    AlphaBeta_action = action
+                    AlphaBeta_score = score
+                    change = 1
+                if alpha < score:
+                    alpha = score
+                if alpha > beta:
+                    break
+
+        else: # Find Min
+            for action in gameState.getLegalActions(agent):  # compare score to all other scores (scores of legal actions)
+                next_state = gameState.generateSuccessor(agent, action)
+                score = self.AlphaBeta(depth, agent + 1, next_state , alpha, beta)[1]
+                if score < AlphaBeta_score or change == 0:
+                    AlphaBeta_action = action
+                    AlphaBeta_score = score
+                    change = 1
+                if beta > score:
+                    beta = score
+                if alpha > beta:
+                    break
+
+
+        if change == 1:
+            return [AlphaBeta_action, AlphaBeta_score]
+        else:
+            return [None, self.evaluationFunction(gameState)]
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
